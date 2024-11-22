@@ -1,47 +1,25 @@
+// App.tsx
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from './screens/HomeScreen';
+import AddMenuScreen from './screens/AddMenuScreen';
+import MainMenuScreen from './screens/MainMenuScreen';
+import FilterMenuScreen from './screens/FilterMenuScreen';
 
-// Screen Components
-const HomeScreen = ({ navigation }: any) => {
-  return (
-    <View style={styles.container}>
-      <Text>Home Screen</Text>
-      <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
-    </View>
-  );
-};
-
-const DetailsScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text>Details Screen</Text>
-    </View>
-  );
-};
-
-// Stack Navigator Setup
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="MainMenu">
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="AddMenu" component={AddMenuScreen} />
+        <Stack.Screen name="MainMenu" component={MainMenuScreen} />
+        <Stack.Screen name="FilterMenu" component={FilterMenuScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-});
 
 export default App;

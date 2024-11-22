@@ -1,3 +1,4 @@
+// screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, FlatList, StyleSheet, Alert, ImageBackground } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,7 +8,15 @@ type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation, route }: HomeScreenProps) {
   const [menuItems, setMenuItems] = useState<{ dishName: string; description: string; course: string; price: number }[]>([]);
-  const [filteredItems, setFilteredItems] = useState(menuItems);
+
+  useEffect(() => {
+    if (route.params?.newItem) {
+      setMenuItems((prevItems) => [
+        ...prevItems,
+        route.params.newItem as { dishName: string; description: string; course: string; price: number }
+      ]);
+    }
+  }, [route.params?.newItem]);
 
   // Calculate average price
   const averagePrice = menuItems.length > 0
@@ -21,46 +30,28 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
       "Are you sure you want to remove this item?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "OK", onPress: () => setMenuItems(menuItems.filter((_, i) => i !== index)) }
+        { text: "OK", onPress: () => {
+          setMenuItems(menuItems.filter((_, i) => i !== index));
+        }}
       ]
     );
   };
-
-  useEffect(() => {
-    if (route.params?.newItem) {
-      setMenuItems((prevItems) => [
-        ...prevItems,
-        route.params.newItem as { dishName: string; description: string; course: string; price: number }
-      ]);
-    }
-
-    if (route.params?.selectedCourse) {
-      const selectedCourse = route.params.selectedCourse;
-      const filtered = menuItems.filter(item => item.course === selectedCourse);
-      setFilteredItems(filtered);
-    } else {
-      setFilteredItems(menuItems);
-    }
-  }, [route.params?.newItem, route.params?.selectedCourse, menuItems]);
 
   return (
     <ImageBackground source={require('../img/wallpaper.jpg')} style={styles.container}>
       <View style={styles.container}>
         <Text style={styles.title}>Menu</Text>
+
         <View style={styles.buttonContainer}>
-          <View style={styles.roundedButton}>
-            <Button title="Add to the Menu" onPress={() => navigation.navigate('AddMenu')} color="black" />
-          </View>
-          <View style={styles.roundedButton}>
-            <Button title="Filter" onPress={() => navigation.navigate('FilterMenu')} color="black" />
-          </View>
+          <Button title="Add to the Menu" onPress={() => navigation.navigate('AddMenu')} color="black" />
+          <Button title="Main Menu" onPress={() => navigation.navigate('MainMenu', { menuItems })} color="black" />
         </View>
 
-        <Text>Total Items: {filteredItems.length}</Text>
+        <Text>Total Items: {menuItems.length}</Text>
         <Text>Average Price: ${averagePrice.toFixed(2)}</Text>
 
         <FlatList
-          data={filteredItems}
+          data={menuItems}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
             <View style={styles.menuItem}>
@@ -93,13 +84,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 20,
-  },
-  roundedButton: {
-    backgroundColor: 'black',
-    borderRadius: 30,
-    height: 60,
-    flex: 1,
-    marginHorizontal: 5,
   },
   menuItem: {
     borderBottomWidth: 1,
